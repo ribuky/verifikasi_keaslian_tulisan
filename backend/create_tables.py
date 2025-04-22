@@ -1,8 +1,9 @@
-from app import create_app, db
+from sqlalchemy import create_engine
 
-app = create_app()
+engine = create_engine("mysql+pymysql://verifikasi_user:passwordku123@localhost/verifikasi_tugas")
 
-with app.app_context():
-    db.create_all()
-    print("✅ Semua tabel berhasil dibuat di database.")
-
+try:
+    with engine.connect() as connection:
+        print("✅ Berhasil terkoneksi ke database!")
+except Exception as e:
+    print("❌ Gagal konek ke DB:", e)
