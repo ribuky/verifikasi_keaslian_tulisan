@@ -47,7 +47,7 @@ def create_app():
     from app import models
 
     # Muat model Siamese
-    load_simese_model()
+    # load_simese_model()
 
     # Import dan registrasi blueprint (rute API)
     from app.routes import api_bp
