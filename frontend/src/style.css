@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+#main-color {background-color: #B87876;}
+#s-color {background-color: #DFB0B0;}
+#t-color {background-color: #F6D7D7;}
+
+main-color {
+    background-color: #B87876;
+}
+
+s-color {
+    background-color: #DFB0B0;
+}
+
+t-color {
+    background-color: #F6D7D7;
+}
+
+.shape {
+    position: absolute;
+    top: 0;
+    left: -25%;
+    width: 150%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.shape svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 240px;
+    filter: drop-shadow(0px 3px 5px rgba(0, 0, 0, 0.4));
+}
+
+.logo-shape {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: auto;
+}
+
+.shape .shape-fill {
+    fill: #B87876;
+}
+
+/** For mobile devices **/
+@media (max-width: 767px) {
+    .shape svg {
+        width: calc(100% + 1.3px);
+        height: 180px;
+    }
+
+    .logo-shape {
+        top: 50px;
+        width: 100px;
+    }
+}
+
+@media (max-width: 425px) {
+    .logo-shape {
+        top: 70px;
+        width: 90px;
+    }
+}
+
+.button-login {
+    background-color: #B87876;
+}
