@@ -606,6 +606,14 @@ def preprocess_image(image_path):
 @api_bp.route("/verify", methods=["POST"])
 @jwt_required()
 def verify_assignment():
+    # Lazy-load Siamese model hanya saat dibutuhkan
+    from app.extensions import model, load_simese_model
+    global model
+    if model is None:
+        print("🔄 Loading Siamese model...")
+        load_simese_model()
+        print("✅ Model loaded for verification.")
+
     if "file" not in request.files or "student_id" not in request.form:
         return jsonify({"message": "File dan student_id diperlukan!"}), 400
 
@@ -613,14 +621,17 @@ def verify_assignment():
     student_id = request.form["student_id"]
     verifier_id = int(get_jwt_identity())
 
+    # Simpan file upload
     filename = f"verify_{student_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.jpg"
     filepath = os.path.join(UPLOAD_FOLDER_VERIFY, filename)
     file.save(filepath)
 
+    # Ambil semua sampel tulisan siswa
     samples = HandwritingSample.query.filter_by(student_id=student_id).all()
     if not samples:
         return jsonify({"message": "❌ Tidak ada sampel tulisan untuk siswa ini!"}), 400
 
+    # Preprocess gambar tugas yang di-upload
     uploaded_img = preprocess_image(filepath)
     similarity_scores = []
 
@@ -629,10 +640,12 @@ def verify_assignment():
         prediction = model.predict([uploaded_img, sample_img])[0][0]
         similarity_scores.append(prediction)
 
+    # Hitung rata-rata similarity
     avg_similarity = np.mean(similarity_scores)
     status_str = "Cocok" if avg_similarity >= 0.75 else "Tidak Cocok"
     status_enum = AssignmentStatus.COCOK if status_str == "Cocok" else AssignmentStatus.TIDAK_COCOK
 
+    # Simpan log verifikasi ke DB
     assignment_id = request.form.get("assignment_id")
     assignment_id = int(assignment_id) if assignment_id else None
 
@@ -652,7 +665,6 @@ def verify_assignment():
         "similarity_score": float(round(avg_similarity, 4)),
         "status": status_str
     }), 200
-
 
 @api_bp.route("/verification_logs", methods=["GET"])
 @jwt_required()
